@@ -1,0 +1,41 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(10, 6vh);
+  grid-template-rows: repeat(10, 6vh);
+  justify-content: center;
+  /* margin: auto; */
+}
+
+.grid-item {
+  padding: 5px;
+  outline: 1px solid rgba(0, 0, 0, .2);
+  background-color: aquamarine;
+}
+
+.player1 {
+  background-color: black;
+}
+
+.player2 {
+  background-color: white;
+}
+
+.barrier {
+  background-color: gray;
+}
+
+.weapon1 {
+  background-color: red;
+}
+
+.weapon2 {
+  background-color: green;
+}
+
+.weapon3 {
+  background-color: yellow;
+}
+
+.weapon4 {
+  background-color: blue;
+}
