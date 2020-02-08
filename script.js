@@ -6,92 +6,206 @@
 //    add class .barrier to found square
 // 3. Choose 4 weapons to be created randomly in the map
 // 4. Create weapons randomly in the map
-// 5. Create player class (start with a default weapon)
+// 5. Create player class
+// finish step 1
+// 6. Start with a default weapon for the players
+// 7. Moves for the player (movePlayer)
+//   7.1 Update de player => rowPosition and colPosition
+//   7.2 Change player in the grid (remove class from the old square and add class to the new square position)
+//   7.3 Applied movements rules
+//      - Only three parallel squares
+//      - Don't pass throw barrier
+//      - If the new position has new weapon, we need to switch weapons
+// finish step 2
+
 
 (function () {
-  const weapons = [ 'weapon1', 'weapon2', 'weapon3', 'weapon4' ];
 
   function getRndNumber() {
     return Math.floor(Math.random() * (10 - 1) + 1);
   }
 
-  function placeBarrier() {
-    const rowPosition = getRndNumber();
-    const colPosition = getRndNumber();
-    const cell = document.querySelectorAll(`div[data-row="${rowPosition}"][data-col="${colPosition}"]`)[0];
-
-    if (cell.classList.contains('taken')) {
-      console.log('exist something int that position');
-      return placeBarrier();
-    }
-
-    console.log('placing barrier');
-    cell.classList.add('barrier');
-    cell.classList.add('taken');
+  function Player(name, weapon) {
+    this.name = name;
+    this.weapon = weapon;
+    this.position = {
+      col: 0,
+      row: 0
+    };
   }
 
-  function placeWeapon(weapon) {
-    const rowPosition = getRndNumber();
-    const colPosition = getRndNumber();
-    const cell = document.querySelectorAll(`div[data-row="${rowPosition}"][data-col="${colPosition}"]`)[0];
+  Player.prototype.canMoveTo = function (newPosiblePosition, callbackIfCan) {
+    const direction = newPosiblePosition.col == this.position.col ? 'row' : 'col';
+    const diffCol = Math.abs(this.position.col - newPosiblePosition.col);
+    const diffRow = Math.abs(this.position.row - newPosiblePosition.row);
 
-    if (cell.classList.contains('taken')) {
-      console.log('exist something int that position');
-      return placeWeapon(weapon);
-    }
+    const validColPosition = direction === 'col' && diffCol <= 3 && diffRow === 0;
+    const validRowPosition = direction === 'row' && diffRow <= 3 && diffCol === 0;
 
-    console.log('placing weapon');
-    cell.classList.add(weapon);
-    cell.classList.add('taken');
+    const canMove = (validColPosition || validRowPosition);
+    canMove && callbackIfCan && callbackIfCan();
+
+    return canMove;
   }
 
-  function placePlayer(player) {
-    const rowPosition = getRndNumber();
-    const colPosition = getRndNumber();
-    const cell = document.querySelectorAll(`div[data-row="${rowPosition}"][data-col="${colPosition}"]`)[0];
-
-    if (cell.classList.contains('taken')) {
-      console.log('exist something int that position');
-      return placePlayer(player);
-    }
-
-    console.log('placing player');
-    cell.classList.add(player.name);
-    cell.classList.add('taken');
+  function TurnBasedGame() {
+    this.containerId = 'game-container';
+    this.defaultWeapon = 'weapon1';
+    this.container = document.getElementById(this.containerId);
+    this.player1 = null;
+    this.player2 = null;
+    this.barriers = [];
+    this.weapons = [];
+    this.playerInTurn = 'player1';
   }
 
+  TurnBasedGame.WEAPONS_ALLOWED = [ 'weapon1', 'weapon2', 'weapon3', 'weapon4' ];
 
-  function createMap() {
+  TurnBasedGame.prototype.createPlayer1 = function() {
+    return new Player('player1', this.defaultWeapon);
+  }
+
+  TurnBasedGame.prototype.createPlayer2 = function() {
+    return new Player('player2', this.defaultWeapon);
+  }
+
+  TurnBasedGame.prototype.createMap = function() {
     let cells = '';
 
     for (let iRow = 1; iRow < 11; iRow++) {
       for (let iCol = 1; iCol < 11; iCol++) {
-        cells += `<div class='grid-item' data-row=${iRow} data-col=${iCol}>${iRow},${iCol}</div>`;
+        cells += `<div class='grid-item' data-col=${iCol} data-row=${iRow} >&nbsp;</div>`;
       }
     }
-    document.getElementById('game-container').innerHTML = cells;
+    this.container.innerHTML = cells;
   }
 
-  createMap();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
-  placeBarrier();
+  TurnBasedGame.prototype.getCell = function(colPosition, rowPosition) {
+    return document
+      .querySelectorAll(`div[data-col="${colPosition}"][data-row="${rowPosition}"]`)[0];
+  }
 
-  placeWeapon('weapon1');
-  placeWeapon('weapon2');
-  placeWeapon('weapon3');
-  placeWeapon('weapon4');
+  TurnBasedGame.prototype.isTaken = function(position, callbackWhileIsTaken) {
+    const cell = this.getCell(position.col, position.row);
+    if (cell.classList.contains('taken')) {
+      console.log('exist something int that position');
+      return callbackWhileIsTaken();
+    }
 
-  placePlayer({ name: 'player1' });
-  placePlayer({ name: 'player2' });
+    return true;
+  }
+
+  TurnBasedGame.prototype.putClass = function(position, newClass) {
+    const cell = this.getCell(position.col, position.row);
+    console.log('placing ' + newClass);
+    cell.classList.add(newClass);
+    cell.classList.add('taken');
+  }
+
+  TurnBasedGame.prototype.removeClass = function(position, classToRemove) {
+    const cell = this.getCell(position.col, position.row);
+    console.log('removing ' + classToRemove);
+    cell.classList.remove(classToRemove);
+    cell.classList.remove('taken');
+  }
+
+  TurnBasedGame.prototype.placeBarrier = function() {
+    const colPosition = getRndNumber();
+    const rowPosition = getRndNumber();
+    const position = {
+      col: colPosition,
+      row: rowPosition
+    };
+    const self = this;
+    this.barriers.push(position);
+    this.isTaken(position, function() {
+      self.placeBarrier();
+    }) && this.putClass(position, 'barrier');
+  }
+
+  TurnBasedGame.prototype.placeWeapon = function(weapon) {
+    const colPosition = getRndNumber();
+    const rowPosition = getRndNumber();
+    const position = {
+      col: colPosition,
+      row: rowPosition
+    };
+    const self = this;
+
+    this.isTaken(position, function() {
+      self.placeWeapon(weapon);
+    }) && this.putClass(position, weapon);
+  }
+
+  TurnBasedGame.prototype.placePlayer = function(player) {
+    const colPosition = getRndNumber();
+    const rowPosition = getRndNumber();
+    const position = {
+      col: colPosition,
+      row: rowPosition
+    };
+    const me = this;
+
+    player.position = position;
+    this.isTaken(position, function() {
+      me.placePlayer(player);
+    }) && this.putClass(position, player.name);
+  }
+
+  TurnBasedGame.prototype.tryMovePlayer = function(player, newPosiblePosition) {
+    const self = this;
+    player.canMoveTo(newPosiblePosition, function() {
+      self.removeClass(player.position, player.name);
+      player.position = newPosiblePosition;
+      self.putClass(player.position, player.name);
+      self.playerInTurn = self.playerInTurn === 'player1' ? 'player2' : 'player1';
+    });
+  }
+
+  TurnBasedGame.prototype.tryMovePlayerInTurn = function(newPosiblePosition) {
+    this.tryMovePlayer(this[this.playerInTurn], newPosiblePosition);
+  }
+
+  TurnBasedGame.prototype.setup = function() {
+    this.createMap();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+    this.placeBarrier();
+
+    this.placeWeapon('weapon1');
+    this.placeWeapon('weapon2');
+    this.placeWeapon('weapon3');
+    this.placeWeapon('weapon4');
+
+    this.player1 = this.createPlayer1();
+    this.placePlayer(this.player1);
+    this.player2 = this.createPlayer2();
+    this.placePlayer(this.player2);
+
+    const self = this;
+
+    this.container.addEventListener("click", function(event) {
+      const element = event.target;
+      const newPosiblePosition = { col: Number(element.dataset.col), row: Number(element.dataset.row) };
+
+      self.tryMovePlayerInTurn(newPosiblePosition);
+
+      //      - Only three parallel squares
+      //      - Don't pass throw barrier
+      //      - If the new position has new weapon, we need to switch weapons
+    });
+  }
+
+  const game = new TurnBasedGame();
+  game.setup();
 
 })()

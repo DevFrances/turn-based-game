@@ -12,6 +12,9 @@
   background-color: aquamarine;
 }
 
+.grid-item::after {
+  content: \00A0;
+}
 .player1 {
   background-color: black;
 }
