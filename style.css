@@ -7,24 +7,34 @@
 }
 
 .grid-item {
+  position: relative;
   padding: 5px;
   outline: 1px solid rgba(0, 0, 0, .2);
   background-color: aquamarine;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .grid-item::after {
   content: \00A0;
 }
-.player1 {
-  background-color: black;
+
+.player-weapon {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: gray;
+  bottom: 0;
+  right: 0;
 }
 
-.player2 {
-  background-color: white;
-}
-
-.barrier {
-  background-color: gray;
+.weapon {
+  background-color: pink;
 }
 
 .weapon1 {
@@ -41,4 +51,16 @@
 
 .weapon4 {
   background-color: blue;
+}
+
+.player1 {
+  background-color: black;
+}
+
+.player2 {
+  background-color: white;
+}
+
+.barrier {
+  background-color: gray;
 }
