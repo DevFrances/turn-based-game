@@ -17,6 +17,12 @@
 //      - Don't pass throw barrier
 //      - If the new position has new weapon, we need to switch weapons
 // finish step 2
+// 8. Know if player are ready to the fight
+// 9. Create sequence fight
+//  9.1 Create a prompt for the player in turn, asking if he decided defend or attack
+//  9.2 If decision defend the damage received will be 50% of the damage triggered by the other player weapon
+//  9.2 If decision attack the other player will reduce his health the damage triggered by the weapon
+
 
 
 (function () {
@@ -29,11 +35,19 @@
 
   function Player(name, weapon) {
     this.name = name;
-    this.weapon = weapon;
+    this.weapon = TurnBasedGame.DEFAULT_WEAPONS[weapon];
     this.position = {
       col: 0,
       row: 0
     };
+    this.health = 100;
+  }
+
+  Player.prototype.getCellContent = function () {
+    return `
+      <span class="player-health" >${this.health}</span>
+      <span class="player-weapon ${this.weapon.key}" >${this.weapon.damage}</span>
+    `;
   }
 
   Player.prototype.canMoveTo = function (newPosiblePosition, callbackIfCan) {
@@ -58,6 +72,20 @@
     this.barriers = [];
     this.weapons = TurnBasedGame.DEFAULT_WEAPONS;
     this.playerInTurn = 'player1';
+    this.defending = false;
+
+    const self = this;
+
+    this.container.addEventListener("click", function(event) {
+      const element = event.target;
+      const newPosiblePosition = {
+        col: Number(element.dataset.col),
+        row: Number(element.dataset.row)
+      };
+
+      self.tryMovePlayerInTurn(newPosiblePosition);
+      self.tryFight();
+    });
   }
 
   TurnBasedGame.DEFAULT_WEAPONS = {
@@ -197,7 +225,7 @@
     if (available) {
       const cell = this.getCell(colPosition, rowPosition);
       player.position = position;
-      cell.innerHTML = `<span class="player-weapon ${DEFAULT_WEAPON}" >&nbsp;</span>`;
+      cell.innerHTML = player.getCellContent();
       this.putClass(position, player.name)
     }
   }
@@ -212,14 +240,14 @@
     const newWeapon = this.findWeaponByPosition(newPosition);
     if (newWeapon) {
       // Put down the old weapon
-      this.weapons[player.weapon].position = newPosition;
-      this.putClass(newPosition, player.weapon, true);
+      this.weapons[player.weapon.key].position = newPosition;
+      this.putClass(newPosition, player.weapon.key, true);
 
       // Put up the new Weapon to the player
       // For the weapons in use the position attribute is null
       this.weapons[newWeapon.key].position = null;
       this.removeClass(newPosition, newWeapon.key);
-      player.weapon = newWeapon.key;
+      player.weapon = this.weapons[newWeapon.key];
     }
   };
 
@@ -240,10 +268,10 @@
     this.switchWeapon(player, newPosition);
 
     // set the player weapon in the cell new content
-    newCell.innerHTML = `<span class="player-weapon ${player.weapon}" >&nbsp;</span>`;
+    newCell.innerHTML = player.getCellContent();
 
     // move turn to next player
-    // this.playerInTurn = this.playerInTurn === 'player1' ? 'player2' : 'player1';
+    this.playerInTurn = this.playerInTurn === 'player1' ? 'player2' : 'player1';
   };
 
   TurnBasedGame.prototype.hasBarriers = function(fromPosition, toPosition) {
@@ -282,6 +310,27 @@
     return false;
   }
 
+  TurnBasedGame.prototype.isReadyToFight = function() {
+    const colPlayer1 = this.player1.position.col;
+    const rowPlayer1 = this.player1.position.row;
+    const colPlayer2 = this.player2.position.col;
+    const rowPlayer2 = this.player2.position.row;
+
+    const diffCol = Math.abs(colPlayer1 - colPlayer2);
+    const diffRow = Math.abs(rowPlayer1 - rowPlayer2);
+
+    const isReadyForCol = diffCol === 1 && diffRow === 0;
+    const isReadyForRow = diffRow === 1 && diffCol === 0;
+
+    if (isReadyForCol || isReadyForRow) {
+      console.log('The player are ready to fight');
+
+      return true
+    }
+
+    return false;
+  }
+
   TurnBasedGame.prototype.tryMovePlayer = function(player, newPosiblePosition) {
     const self = this;
     player.canMoveTo(newPosiblePosition, function() {
@@ -293,6 +342,39 @@
 
   TurnBasedGame.prototype.tryMovePlayerInTurn = function(newPosiblePosition) {
     this.tryMovePlayer(this[this.playerInTurn], newPosiblePosition);
+  }
+
+  TurnBasedGame.prototype.tryFight = function() {
+    const self = this;
+
+    if (self.isReadyToFight() && (self.player1.health > 0 && self.player2.health > 0)) {
+      this.playerInTurn = this.playerInTurn === 'player1' ? 'player2' : 'player1';
+      setTimeout(function() {
+        const playerInTurn = self[self.playerInTurn];
+        const anotherPlayerKey = self.playerInTurn === 'player1' ? 'player2' : 'player1';
+        const anotherPlayer = self[anotherPlayerKey];
+
+        console.log(playerInTurn.name + " => " + anotherPlayer.name);
+        const responseAction = prompt(playerInTurn.name + ", do you want 'attack' or 'defend' ?");
+        const action = responseAction === 'attack' ? 'attack' : 'defend';
+
+        console.log(playerInTurn.name + ' decided ', action);
+
+        if (action === 'attack') {
+          playerInTurn.defending = false;
+          console.log(anotherPlayer.name + '.health before', anotherPlayer.health);
+          anotherPlayer.health -= anotherPlayer.defending ? playerInTurn.weapon.damage * .5 : playerInTurn.weapon.damage;
+          anotherPlayer.health = Math.max(anotherPlayer.health, 0);
+          console.log(anotherPlayer.name + '.health after', anotherPlayer.health);
+        } else if (action === 'defend') {
+          // the player in turn decided defend
+          playerInTurn.defending = true;
+        }
+
+        self.getCell(anotherPlayer.position.col, anotherPlayer.position.row).innerHTML = anotherPlayer.getCellContent();
+        self.tryFight();
+      }, 0);
+    }
   }
 
   TurnBasedGame.prototype.setup = function() {
@@ -317,22 +399,14 @@
     this.player2 = this.createPlayer2();
     this.placePlayer(this.player2);
 
+    if (this.isReadyToFight()) {
+      this.setup();
+    }
+
     this.placeWeapon('weapon1');
     this.placeWeapon('weapon2');
     this.placeWeapon('weapon3');
     this.placeWeapon('weapon4');
-
-    const self = this;
-
-    this.container.addEventListener("click", function(event) {
-      const element = event.target;
-      const newPosiblePosition = {
-        col: Number(element.dataset.col),
-        row: Number(element.dataset.row)
-      };
-
-      self.tryMovePlayerInTurn(newPosiblePosition);
-    });
   }
 
   const game = new TurnBasedGame();

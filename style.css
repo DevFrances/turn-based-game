@@ -24,6 +24,16 @@
   content: \00A0;
 }
 
+.player-health {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border: gray;
+  background-color: greenyellow;
+  bottom: 0;
+  left: 0;
+}
+
 .player-weapon {
   position: absolute;
   width: 16px;
