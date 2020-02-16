@@ -1,5 +1,6 @@
 .grid-container {
   display: grid;
+  margin-top: 150px;
   grid-template-columns: repeat(10, 6vh);
   grid-template-rows: repeat(10, 6vh);
   justify-content: center;
@@ -29,9 +30,74 @@
   width: 32px;
   height: 32px;
   border: gray;
-  background-color: greenyellow;
+  background-color: #adff2f;
   bottom: 0;
   left: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.player-health[data-health="90"] {
+  background-color: #d9ff2f;
+}
+.player-health[data-health="95"] {
+  background-color: #d9ff2f;
+}
+
+.player-health[data-health="80"] {
+  background-color: #e0ff2f;
+}
+.player-health[data-health="85"] {
+  background-color: #e0ff2f;
+}
+
+.player-health[data-health="70"] {
+  background-color: #ffea2ff1;
+}
+.player-health[data-health="75"] {
+  background-color: #ffea2ff1;
+}
+
+.player-health[data-health="60"] {
+  background-color: #ffce2ff1;
+}
+.player-health[data-health="65"] {
+  background-color: #ffce2ff1;
+}
+
+.player-health[data-health="50"] {
+  background-color: #ffbd2ff1;
+}
+.player-health[data-health="55"] {
+  background-color: #ffbd2ff1;
+}
+
+.player-health[data-health="40"] {
+  background-color: #ffac2f;
+}
+.player-health[data-health="45"] {
+  background-color: #ffac2f;
+}
+
+.player-health[data-health="30"] {
+  background-color: #ff712f;
+}
+.player-health[data-health="35"] {
+  background-color: #ff712f;
+}
+
+.player-health[data-health="20"] {
+  background-color: #ff6a2f;
+}
+.player-health[data-health="25"] {
+  background-color: #ff6a2f;
+}
+
+.player-health[data-health="10"] {
+  background-color: #ff2f2f;
+}
+.player-health[data-health="15"] {
+  background-color: #ff2f2f;
 }
 
 .player-weapon {

@@ -45,7 +45,7 @@
 
   Player.prototype.getCellContent = function () {
     return `
-      <span class="player-health" >${this.health}</span>
+      <span class="player-health" data-health="${this.health}" >${this.health}</span>
       <span class="player-weapon ${this.weapon.key}" >${this.weapon.damage}</span>
     `;
   }
@@ -346,8 +346,11 @@
 
   TurnBasedGame.prototype.tryFight = function() {
     const self = this;
+    if (!self.isReadyToFight()) {
+      return
+    }
 
-    if (self.isReadyToFight() && (self.player1.health > 0 && self.player2.health > 0)) {
+    if (self.player1.health > 0 && self.player2.health > 0) {
       this.playerInTurn = this.playerInTurn === 'player1' ? 'player2' : 'player1';
       setTimeout(function() {
         const playerInTurn = self[self.playerInTurn];
@@ -356,6 +359,11 @@
 
         console.log(playerInTurn.name + " => " + anotherPlayer.name);
         const responseAction = prompt(playerInTurn.name + ", do you want 'attack' or 'defend' ?");
+
+        if (!responseAction) {
+          return self.setup();
+        }
+
         const action = responseAction === 'attack' ? 'attack' : 'defend';
 
         console.log(playerInTurn.name + ' decided ', action);
@@ -367,13 +375,16 @@
           anotherPlayer.health = Math.max(anotherPlayer.health, 0);
           console.log(anotherPlayer.name + '.health after', anotherPlayer.health);
         } else if (action === 'defend') {
-          // the player in turn decided defend
           playerInTurn.defending = true;
         }
 
         self.getCell(anotherPlayer.position.col, anotherPlayer.position.row).innerHTML = anotherPlayer.getCellContent();
         self.tryFight();
-      }, 0);
+      }, 100);
+    } else {
+      self.player2.health <= 0 && alert('player1 winner !!!');
+      self.player1.health <= 0 && alert('player2 winner !!!');
+      self.setup();
     }
   }
 
