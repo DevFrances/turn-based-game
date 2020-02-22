@@ -83,6 +83,7 @@
   Player.prototype.refreshSummaryHtml = function () {
     const cell = this.getCellHtml();
     this.summaryContainer.innerHTML = `
+      <h2 class="turn-title">${this.name}</h2>
       <h3 class="turn-title">${this.fighting ? 'in fight mode' : 'moving'}</h3>
       <h4 class="turn-title">${this.inTurn ? 'in turn' : 'waiting'}</h4>
       <h5 class="turn-title" ${this.fighting ? '' : 'hidden'} >
