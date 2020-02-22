@@ -145,6 +145,13 @@
   vertical-align: middle;
 }
 
+.weapon {
+  background-image: url('./images/weapon.png');
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
 .weapon1 {
   background-image: url('./images/weapon1.png');
   background-size: 100%;

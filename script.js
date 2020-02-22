@@ -394,9 +394,6 @@
 
   TurnBasedGame.prototype.tryFight = function() {
     const self = this;
-    const playerInTurn = self[self.playerInTurn];
-    const anotherPlayerKey = self.playerInTurn === 'player1' ? 'player2' : 'player1';
-    const anotherPlayer = self[anotherPlayerKey];
 
     if (!self.isReadyToFight()) {
       return
@@ -404,6 +401,10 @@
 
     if (self.player1.health > 0 && self.player2.health > 0) {
       this.playerInTurn = this.playerInTurn === 'player1' ? 'player2' : 'player1';
+      const playerInTurn = self[self.playerInTurn];
+      const anotherPlayerKey = self.playerInTurn === 'player1' ? 'player2' : 'player1';
+      const anotherPlayer = self[anotherPlayerKey];
+      
       playerInTurn.inTurn = true;
       anotherPlayer.inTurn = false;
       playerInTurn.fighting = true;
@@ -441,7 +442,9 @@
         self.tryFight();
       }, 100);
     } else {
-      anotherPlayer.refreshHtml();
+      self.player1.refreshHtml();
+      self.player2.refreshHtml();
+
       setTimeout(function() {
         self.player2.health <= 0 && alert('player1 winner !!!');
         self.player1.health <= 0 && alert('player2 winner !!!');
