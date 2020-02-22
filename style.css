@@ -25,8 +25,8 @@
 
 .player-info .player-cell {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 128px;
+  height: 128px;
 }
 
 .grid-item {
@@ -131,40 +131,60 @@
 .player-weapon {
   position: absolute;
   width: 24px;
+  height: 34px;
+  bottom: 0;
+  right: -8px;
+}
+
+.player-weapon>span {
+  display: inline-block;
+  width: 24px;
   height: 24px;
   border: gray;
-  bottom: 0;
-  right: 0;
   text-align: center;
   vertical-align: middle;
 }
 
-.weapon {
-  background-color: pink;
-}
-
 .weapon1 {
-  background-color: red;
+  background-image: url('./images/weapon1.png');
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .weapon2 {
-  background-color: green;
+  background-image: url('./images/weapon2.png');
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .weapon3 {
-  background-color: yellow;
+  background-image: url('./images/weapon3.png');
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .weapon4 {
-  background-color: blue;
+  background-image: url('./images/weapon4.png');
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .player1 {
-  background-color: black;
+  background-image: url('./images/player1.png');
+  background-size: 110%;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .player2 {
-  background-color: white;
+  background-image: url('./images/player2.png');
+  background-size: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .barrier {

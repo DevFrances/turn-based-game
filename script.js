@@ -64,7 +64,10 @@
   Player.prototype.getCellHtml = function (newPosition) {
     return `
       <span class="player-health" data-health="${this.health}" >${this.health}</span>
-      <span class="player-weapon ${this.weapon.key}" >${this.weapon.damage}</span>
+      <div class="player-weapon">
+        <span class="${this.weapon.key}" >&nbsp;</span>
+        <span>${this.weapon.damage}</span>
+      </div>
     `;
   }
 
@@ -74,7 +77,6 @@
       oldCell.innerHTML = '&nbsp;';
     }
 
-    this.getCell().innerHTML = this.getCellHtml();
     this.refreshSummaryHtml();
   }
 
