@@ -1,10 +1,32 @@
-.grid-container {
-  display: grid;
-  margin-top: 150px;
-  grid-template-columns: repeat(10, 6vh);
-  grid-template-rows: repeat(10, 6vh);
+#game-container {
+  display: flex;
+  margin-top: 80px;
   justify-content: center;
-  /* margin: auto; */
+}
+
+.player-info {
+  height: 100%;
+  width: 150px;
+  height: 80vh;
+  background-color: lightgrey;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+#grid-container {
+  display: grid;
+  grid-template-columns: repeat(10, 8vh);
+  grid-template-rows: repeat(10, 8vh);
+  justify-content: center;
+}
+
+.player-info .player-cell {
+  position: relative;
+  width: 64px;
+  height: 64px;
 }
 
 .grid-item {
@@ -102,8 +124,8 @@
 
 .player-weapon {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   border: gray;
   bottom: 0;
   right: 0;
