@@ -412,7 +412,7 @@
 
       setTimeout(function() {
         console.log(playerInTurn.name + " => " + anotherPlayer.name);
-        const responseAction = prompt(playerInTurn.name + ", do you want 'attack' (a) or 'defend' (d) ?");
+        const responseAction = prompt(playerInTurn.name + ", do you want 'attack' (a) or 'defend' (d) ?", 'attack');
 
         if (!responseAction) {
           return self.setup();
