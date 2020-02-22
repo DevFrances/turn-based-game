@@ -398,7 +398,7 @@
 
     if (!self.isReadyToFight()) {
       return
-    }    
+    }
 
     if (self.player1.health > 0 && self.player2.health > 0) {
       this.playerInTurn = this.playerInTurn === 'player1' ? 'player2' : 'player1';
@@ -458,7 +458,9 @@
     this.barriers = [];
     this.weapons = TurnBasedGame.DEFAULT_WEAPONS;
     this.playerInTurn = 'player1';
+
     this.createMap();
+
     this.placeBarrier();
     this.placeBarrier();
     this.placeBarrier();
@@ -489,6 +491,7 @@
     this.placeWeapon('weapon4');
   }
 
+  // Start the game
   const game = new TurnBasedGame();
   game.setup();
 
